@@ -1,0 +1,18 @@
+{% extends "web/base.html" %}
+{% block title %}Phinma Education - Response{% endblock %}
+{% block content %}
+    <section class="section">
+    <h1 class="title">Processing payment</h1>
+        <br>
+    <h2 class="subtitle">We are currently processing your payment. Kindly check your email or sms for any updates.</h2>
+    <p class="small">This page will return to main in 5 seconds. Click <a href="{% url 'index' %}">here</a> to return now</p>
+    </section>
+
+{% endblock %}
+{% block tailscripts %}
+    <script>
+      setTimeout(function(){
+        window.location.href = '/';
+      }, 5000);
+    </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "web/base.html" %}
+{% block title %}Phinma Education - Payment Instructions{% endblock %}
+{% block content %}
+<section class="section">
+<h1 class="title">Payment Instructions</h1>
+{% for payment in result.direct_otc_info %}
+{% autoescape off %}
+    <p>{{ payment.pay_instructions }}</p>
+{% endautoescape %}
+
+
+{% endfor %}
+</section>
+{% endblock %}

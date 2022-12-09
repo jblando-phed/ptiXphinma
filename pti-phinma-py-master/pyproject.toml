@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "phinma"
+version = "0.1.0"
+description = ""
+authors = ["Ray <jenn0pal@yahoo.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^4.0.2"
+requests = "^2.27.1"
+whitenoise = {extras = ["brotli"], version = "^6.0.0"}
+django-environ = "^0.8.1"
+gunicorn = "^20.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

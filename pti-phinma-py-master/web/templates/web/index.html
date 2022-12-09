@@ -1,0 +1,923 @@
+{% extends "web/base.html" %}
+{% load static %}
+
+{% block title %}Phinma Education - Payment Form{% endblock %}
+
+{% block content %}
+
+
+    <h2 class="h3 fw-light mb-5">Student Information</h2>
+    <form name="payment_form" id="paymentForm" method="POST" action="{% url 'index' %}">
+        {% csrf_token %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="notification {{ message.tags }} is-light">
+                 <button class="delete"></button>
+                    {{ message }} <br>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="notification is-danger is-light">
+        <button class="delete"></button>
+            {% for error in form.non_field_errors %}
+                {{ message }} <br>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+            {% for field in form %}
+                {% if field.errors %}
+                    <div class="notification is-danger is-light">
+                        <button class="delete"></button>
+                        {% for error in field.errors %}
+                            <strong>{{ field.label }}</strong>: {{ error }} <br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+
+        <div class="columns">
+            <div class="column">
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <label class="mb-2">Campus <span class="text-danger">*</span></label>
+                        <div class="select is-fullwidth">
+                            <select name="campus" required>
+                                {% if  form.campus.value %}
+                                    <option value="{{ form.campus.value|default_if_none:'' }}"
+                                            selected>{{ form.campus.value }}</option>
+                                {% else %}
+                                    <option value="" disabled selected>Select Campus</option>
+                                {% endif %}
+
+                                <option value="AU Main">AU Main</option>
+                                <option value="AU South">AU South</option>
+                                <option value="AU San Jose">AU San Jose</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">Student Number<span class="text-danger">*</span></label>
+                    <div class="control">
+                        <input value="{{ form.student_number.value|default_if_none:'' }}" required placeholder=""
+                               name="student_number" class="input" type="text" value="{{ form.student_number.value|default_if_none:'' }}">
+                    </div>
+                </div>
+            </div>
+            {#            <div class="column">#}
+            {#                <div class="field">#}
+            {#                    <label class="mb-2">School Year <span class="text-danger">*</span></label>#}
+            {#                    <div class="control">#}
+            {#                        <input value="{{ form.student_number.value|default_if_none:'' }}" required name="school_year" class="input" type="text" placeholder="">#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            </div>#}
+        </div>
+
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">First Name <span class="text-danger">*</span></label>
+                    <div class="control">
+                        <input value="{{ form.fname.value|default_if_none:'' }}" required name="fname" class="input"
+                               type="text" placeholder="">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">Last Name <span class="text-danger">*</span></label>
+                    <div class="control">
+                        <input value="{{ form.lname.value|default_if_none:'' }}" required name="lname" class="input"
+                               type="text" placeholder="">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">Middle Name</label>
+                    <div class="control">
+                        <input value="{{ form.mname.value|default_if_none:'' }}" name="mname" class="input"
+                               type="text" placeholder="">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">Email Address <span class="text-danger">*</span></label>
+                    <div class="control">
+                        <input value="{{ form.email.value|default_if_none:'' }}" required name="email" class="input"
+                               type="email" placeholder="">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="mb-2">Mobile Number <span class="text-danger">*</span></label>
+                    <div class="control">
+                        <input value="{{ form.mobile.value|default_if_none:'' }}" required name="mobile" class="input"
+                               type="text" placeholder="09123456789" maxlength="11"
+                               onkeypress="return onlyNumberKey(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="column"></div>
+        </div>
+
+        <br>
+        <hr>
+        <br>
+        <h1 class="h3 fw-light mb-5">Parent or Guardian Information</h1>
+        <div v-scope="Address()" @vue:mounted="mounted" class="content mt-5">
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Name <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_name.value|default_if_none:'' }}" required name="parent_name"
+                                   class="input" type="text" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Email Address <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_email.value|default_if_none:'' }}" required name="parent_email"
+                                   class="input" type="email" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Mobile Number <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_mobile.value|default_if_none:'' }}" required
+                                   name="parent_mobile" class="input" type="text" placeholder="09123456789"
+                                   maxlength="11" onkeypress="return onlyNumberKey(event)">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Address A <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_address1.value|default_if_none:'' }}" required
+                                   name="parent_address1" class="input" type="text" maxlength="100"
+                                   placeholder="Unit No / Lot no. St">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Address B</label>
+                        <div class="control">
+                            <input value="{{ form.parent_address2.value|default_if_none:'' }}" name="parent_address2"
+                                   class="input" type="text" maxlength="100"
+                                   placeholder="Barangay">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">City <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_city.value|default_if_none:'' }}" required name="parent_city"
+                                   class="input" type="text" placeholder=""
+                                   maxlength="30">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">State / Region <span class="text-danger">*</span></label>
+                        {% comment %}<div class="control">
+                            <input value="{{ form.student_number.value|default_if_none:'' }}" required name="parent_region" class="input" type="text" placeholder=""
+                                   maxlength="30">
+                        </div>{% endcomment %}
+                        <div class="select is-fullwidth">
+                            <select v-model="province" name="parent_region" required>
+                                {% if  form.parent_region.value %}
+                                    <option value="{{ form.parent_region.value|default_if_none:'' }}"
+                                            selected>{{ form.parent_region.value }}</option>
+                                {% else %}
+                                    <option value="" disabled selected>Select Province</option>
+                                {% endif %}
+
+                                <option v-for="(region, index) in regions" :value="region.name">$[[ region.name ]]
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <label class="mb-2">Country <span class="text-danger">*</span></label>
+                            <div class="select is-fullwidth">
+                                <select name="parent_country">
+                                    {% if  form.parent_country.value %}
+                                        <option value="{{ form.parent_country.value|default_if_none:'' }}"
+                                                selected>{{ form.parent_country.value }}</option>
+                                    {% endif %}
+                                    <option value="Afganistan">Afghanistan</option>
+                                    <option value="Albania">Albania</option>
+                                    <option value="Algeria">Algeria</option>
+                                    <option value="American Samoa">American Samoa</option>
+                                    <option value="Andorra">Andorra</option>
+                                    <option value="Angola">Angola</option>
+                                    <option value="Anguilla">Anguilla</option>
+                                    <option value="Antigua & Barbuda">Antigua & Barbuda</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Armenia">Armenia</option>
+                                    <option value="Aruba">Aruba</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Austria">Austria</option>
+                                    <option value="Azerbaijan">Azerbaijan</option>
+                                    <option value="Bahamas">Bahamas</option>
+                                    <option value="Bahrain">Bahrain</option>
+                                    <option value="Bangladesh">Bangladesh</option>
+                                    <option value="Barbados">Barbados</option>
+                                    <option value="Belarus">Belarus</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Belize">Belize</option>
+                                    <option value="Benin">Benin</option>
+                                    <option value="Bermuda">Bermuda</option>
+                                    <option value="Bhutan">Bhutan</option>
+                                    <option value="Bolivia">Bolivia</option>
+                                    <option value="Bonaire">Bonaire</option>
+                                    <option value="Bosnia & Herzegovina">Bosnia & Herzegovina</option>
+                                    <option value="Botswana">Botswana</option>
+                                    <option value="Brazil">Brazil</option>
+                                    <option value="British Indian Ocean Ter">British Indian Ocean Ter</option>
+                                    <option value="Brunei">Brunei</option>
+                                    <option value="Bulgaria">Bulgaria</option>
+                                    <option value="Burkina Faso">Burkina Faso</option>
+                                    <option value="Burundi">Burundi</option>
+                                    <option value="Cambodia">Cambodia</option>
+                                    <option value="Cameroon">Cameroon</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Canary Islands">Canary Islands</option>
+                                    <option value="Cape Verde">Cape Verde</option>
+                                    <option value="Cayman Islands">Cayman Islands</option>
+                                    <option value="Central African Republic">Central African Republic</option>
+                                    <option value="Chad">Chad</option>
+                                    <option value="Channel Islands">Channel Islands</option>
+                                    <option value="Chile">Chile</option>
+                                    <option value="China">China</option>
+                                    <option value="Christmas Island">Christmas Island</option>
+                                    <option value="Cocos Island">Cocos Island</option>
+                                    <option value="Colombia">Colombia</option>
+                                    <option value="Comoros">Comoros</option>
+                                    <option value="Congo">Congo</option>
+                                    <option value="Cook Islands">Cook Islands</option>
+                                    <option value="Costa Rica">Costa Rica</option>
+                                    <option value="Cote DIvoire">Cote DIvoire</option>
+                                    <option value="Croatia">Croatia</option>
+                                    <option value="Cuba">Cuba</option>
+                                    <option value="Curaco">Curacao</option>
+                                    <option value="Cyprus">Cyprus</option>
+                                    <option value="Czech Republic">Czech Republic</option>
+                                    <option value="Denmark">Denmark</option>
+                                    <option value="Djibouti">Djibouti</option>
+                                    <option value="Dominica">Dominica</option>
+                                    <option value="Dominican Republic">Dominican Republic</option>
+                                    <option value="East Timor">East Timor</option>
+                                    <option value="Ecuador">Ecuador</option>
+                                    <option value="Egypt">Egypt</option>
+                                    <option value="El Salvador">El Salvador</option>
+                                    <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                    <option value="Eritrea">Eritrea</option>
+                                    <option value="Estonia">Estonia</option>
+                                    <option value="Ethiopia">Ethiopia</option>
+                                    <option value="Falkland Islands">Falkland Islands</option>
+                                    <option value="Faroe Islands">Faroe Islands</option>
+                                    <option value="Fiji">Fiji</option>
+                                    <option value="Finland">Finland</option>
+                                    <option value="France">France</option>
+                                    <option value="French Guiana">French Guiana</option>
+                                    <option value="French Polynesia">French Polynesia</option>
+                                    <option value="French Southern Ter">French Southern Ter</option>
+                                    <option value="Gabon">Gabon</option>
+                                    <option value="Gambia">Gambia</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="Ghana">Ghana</option>
+                                    <option value="Gibraltar">Gibraltar</option>
+                                    <option value="Great Britain">Great Britain</option>
+                                    <option value="Greece">Greece</option>
+                                    <option value="Greenland">Greenland</option>
+                                    <option value="Grenada">Grenada</option>
+                                    <option value="Guadeloupe">Guadeloupe</option>
+                                    <option value="Guam">Guam</option>
+                                    <option value="Guatemala">Guatemala</option>
+                                    <option value="Guinea">Guinea</option>
+                                    <option value="Guyana">Guyana</option>
+                                    <option value="Haiti">Haiti</option>
+                                    <option value="Hawaii">Hawaii</option>
+                                    <option value="Honduras">Honduras</option>
+                                    <option value="Hong Kong">Hong Kong</option>
+                                    <option value="Hungary">Hungary</option>
+                                    <option value="Iceland">Iceland</option>
+                                    <option value="Indonesia">Indonesia</option>
+                                    <option value="India">India</option>
+                                    <option value="Iran">Iran</option>
+                                    <option value="Iraq">Iraq</option>
+                                    <option value="Ireland">Ireland</option>
+                                    <option value="Isle of Man">Isle of Man</option>
+                                    <option value="Israel">Israel</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Jamaica">Jamaica</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="Jordan">Jordan</option>
+                                    <option value="Kazakhstan">Kazakhstan</option>
+                                    <option value="Kenya">Kenya</option>
+                                    <option value="Kiribati">Kiribati</option>
+                                    <option value="Korea North">Korea North</option>
+                                    <option value="Korea Sout">Korea South</option>
+                                    <option value="Kuwait">Kuwait</option>
+                                    <option value="Kyrgyzstan">Kyrgyzstan</option>
+                                    <option value="Laos">Laos</option>
+                                    <option value="Latvia">Latvia</option>
+                                    <option value="Lebanon">Lebanon</option>
+                                    <option value="Lesotho">Lesotho</option>
+                                    <option value="Liberia">Liberia</option>
+                                    <option value="Libya">Libya</option>
+                                    <option value="Liechtenstein">Liechtenstein</option>
+                                    <option value="Lithuania">Lithuania</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Macau">Macau</option>
+                                    <option value="Macedonia">Macedonia</option>
+                                    <option value="Madagascar">Madagascar</option>
+                                    <option value="Malaysia">Malaysia</option>
+                                    <option value="Malawi">Malawi</option>
+                                    <option value="Maldives">Maldives</option>
+                                    <option value="Mali">Mali</option>
+                                    <option value="Malta">Malta</option>
+                                    <option value="Marshall Islands">Marshall Islands</option>
+                                    <option value="Martinique">Martinique</option>
+                                    <option value="Mauritania">Mauritania</option>
+                                    <option value="Mauritius">Mauritius</option>
+                                    <option value="Mayotte">Mayotte</option>
+                                    <option value="Mexico">Mexico</option>
+                                    <option value="Midway Islands">Midway Islands</option>
+                                    <option value="Moldova">Moldova</option>
+                                    <option value="Monaco">Monaco</option>
+                                    <option value="Mongolia">Mongolia</option>
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Morocco">Morocco</option>
+                                    <option value="Mozambique">Mozambique</option>
+                                    <option value="Myanmar">Myanmar</option>
+                                    <option value="Nambia">Nambia</option>
+                                    <option value="Nauru">Nauru</option>
+                                    <option value="Nepal">Nepal</option>
+                                    <option value="Netherland Antilles">Netherland Antilles</option>
+                                    <option value="Netherlands">Netherlands (Holland, Europe)</option>
+                                    <option value="Nevis">Nevis</option>
+                                    <option value="New Caledonia">New Caledonia</option>
+                                    <option value="New Zealand">New Zealand</option>
+                                    <option value="Nicaragua">Nicaragua</option>
+                                    <option value="Niger">Niger</option>
+                                    <option value="Nigeria">Nigeria</option>
+                                    <option value="Niue">Niue</option>
+                                    <option value="Norfolk Island">Norfolk Island</option>
+                                    <option value="Norway">Norway</option>
+                                    <option value="Oman">Oman</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                    <option value="Palau Island">Palau Island</option>
+                                    <option value="Palestine">Palestine</option>
+                                    <option value="Panama">Panama</option>
+                                    <option value="Papua New Guinea">Papua New Guinea</option>
+                                    <option value="Paraguay">Paraguay</option>
+                                    <option value="Peru">Peru</option>
+                                    <option value="Philippines" selected>Philippines</option>
+                                    <option value="Pitcairn Island">Pitcairn Island</option>
+                                    <option value="Poland">Poland</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Puerto Rico">Puerto Rico</option>
+                                    <option value="Qatar">Qatar</option>
+                                    <option value="Republic of Montenegro">Republic of Montenegro</option>
+                                    <option value="Republic of Serbia">Republic of Serbia</option>
+                                    <option value="Reunion">Reunion</option>
+                                    <option value="Romania">Romania</option>
+                                    <option value="Russia">Russia</option>
+                                    <option value="Rwanda">Rwanda</option>
+                                    <option value="St Barthelemy">St Barthelemy</option>
+                                    <option value="St Eustatius">St Eustatius</option>
+                                    <option value="St Helena">St Helena</option>
+                                    <option value="St Kitts-Nevis">St Kitts-Nevis</option>
+                                    <option value="St Lucia">St Lucia</option>
+                                    <option value="St Maarten">St Maarten</option>
+                                    <option value="St Pierre & Miquelon">St Pierre & Miquelon</option>
+                                    <option value="St Vincent & Grenadines">St Vincent & Grenadines</option>
+                                    <option value="Saipan">Saipan</option>
+                                    <option value="Samoa">Samoa</option>
+                                    <option value="Samoa American">Samoa American</option>
+                                    <option value="San Marino">San Marino</option>
+                                    <option value="Sao Tome & Principe">Sao Tome & Principe</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="Senegal">Senegal</option>
+                                    <option value="Seychelles">Seychelles</option>
+                                    <option value="Sierra Leone">Sierra Leone</option>
+                                    <option value="Singapore">Singapore</option>
+                                    <option value="Slovakia">Slovakia</option>
+                                    <option value="Slovenia">Slovenia</option>
+                                    <option value="Solomon Islands">Solomon Islands</option>
+                                    <option value="Somalia">Somalia</option>
+                                    <option value="South Africa">South Africa</option>
+                                    <option value="Spain">Spain</option>
+                                    <option value="Sri Lanka">Sri Lanka</option>
+                                    <option value="Sudan">Sudan</option>
+                                    <option value="Suriname">Suriname</option>
+                                    <option value="Swaziland">Swaziland</option>
+                                    <option value="Sweden">Sweden</option>
+                                    <option value="Switzerland">Switzerland</option>
+                                    <option value="Syria">Syria</option>
+                                    <option value="Tahiti">Tahiti</option>
+                                    <option value="Taiwan">Taiwan</option>
+                                    <option value="Tajikistan">Tajikistan</option>
+                                    <option value="Tanzania">Tanzania</option>
+                                    <option value="Thailand">Thailand</option>
+                                    <option value="Togo">Togo</option>
+                                    <option value="Tokelau">Tokelau</option>
+                                    <option value="Tonga">Tonga</option>
+                                    <option value="Trinidad & Tobago">Trinidad & Tobago</option>
+                                    <option value="Tunisia">Tunisia</option>
+                                    <option value="Turkey">Turkey</option>
+                                    <option value="Turkmenistan">Turkmenistan</option>
+                                    <option value="Turks & Caicos Is">Turks & Caicos Is</option>
+                                    <option value="Tuvalu">Tuvalu</option>
+                                    <option value="Uganda">Uganda</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                    <option value="United Arab Erimates">United Arab Emirates</option>
+                                    <option value="United States of America">United States of America</option>
+                                    <option value="Uraguay">Uruguay</option>
+                                    <option value="Uzbekistan">Uzbekistan</option>
+                                    <option value="Vanuatu">Vanuatu</option>
+                                    <option value="Vatican City State">Vatican City State</option>
+                                    <option value="Venezuela">Venezuela</option>
+                                    <option value="Vietnam">Vietnam</option>
+                                    <option value="Virgin Islands (Brit)">Virgin Islands (Brit)</option>
+                                    <option value="Virgin Islands (USA)">Virgin Islands (USA)</option>
+                                    <option value="Wake Island">Wake Island</option>
+                                    <option value="Wallis & Futana Is">Wallis & Futana Is</option>
+                                    <option value="Yemen">Yemen</option>
+                                    <option value="Zaire">Zaire</option>
+                                    <option value="Zambia">Zambia</option>
+                                    <option value="Zimbabwe">Zimbabwe</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="mb-2">Zip <span class="text-danger">*</span></label>
+                        <div class="control">
+                            <input value="{{ form.parent_zip.value|default_if_none:'' }}" required name="parent_zip"
+                                   class="input" type="text" placeholder=""
+                                   maxlength="12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <br>
+        <hr>
+        <br>
+
+        <h1 class="h3 fw-light mb-5">Payment Details</h1>
+
+        <div v-scope="Payment()" @vue:mounted="mounted">
+            <div class="content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <label class="mb-2">Payment Particulars <span class="text-danger">*</span></label>
+                                <div class="select is-fullwidth">
+                                    <select name="payment_particular"
+                                            v-model="paymentParticular"
+                                            required autocomplete="off" id="payment_particular"
+                                            @change="resetTotal">
+                                        <option value="" disabled selected>Choose here</option>
+                                        <option v-for="payment in paymentParticulars" :value="payment">$[[ payment ]]
+                                        </option>
+
+                                        {% comment %}<option value="Tuition Fee" >Tuition Fee</option>
+                                <option value="Rental">Rental</option>
+                                <option value="Registrar Fees">Registrar Fees</option>
+                                <option value="Other school fees">Other school fees</option>{% endcomment %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticular === 'Registrar Fees'">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <label class="mb-2">Select One <span class="text-danger">*</span></label>
+                                <div class="select is-fullwidth">
+                                    <select class="custom-select form-control"
+                                            v-model="paymentParticularType"
+                                            name="payment_particular_type"
+                                            autocomplete="off"
+                                            id="payment_particular_type">
+                                        <option value="" disabled selected>Choose here</option>
+                                        <option value="Transcript of records">Transcript of records</option>
+                                        <option value="Diploma">Diploma</option>
+                                        <option value="Certification">Certification</option>
+                                        <option value="Adding/dropping">Adding/dropping</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticularType === 'Others' && paymentParticular === 'Registrar Fees' ">
+                        <div class="field">
+                            <label class="mb-2">Please specify <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.payment_particular_type_other.value|default_if_none:'' }}"
+                                       name="payment_particular_type_other" class="input" type="text" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticular === 'Other school fees'">
+                        <div class="field">
+                            <label class="mb-2">Please specify <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.payment_particular_type.value|default_if_none:'' }}"
+                                       name="payment_particular_type" class="input" type="text" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    {#                <div class="column">#}
+                    {#                    <div class="field has-addons">#}
+                    {#                        <div class="control is-expanded">#}
+                    {#                            <label class="mb-2">Terms <span class="text-danger">*</span></label>#}
+                    {#                            <div class="select is-fullwidth">#}
+                    {#                                <select class="custom-select form-control" name="terms" id="terms" required onchange="paymentTerms(this);">#}
+                    {#                                    <option value="" selected="selected">Choose here</option>#}
+                    {#                                    <option value="Full Payment">Full Payment</option>#}
+                    {#                                    <option value="Installment">Installment</option>#}
+                    {#                                </select>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                </div>#}
+
+                    <div class="column" v-if="paymentParticular === 'Tuition Fee'">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <label class="mb-2">Select one <span class="text-danger">*</span></label>
+                                <div class="select is-fullwidth">
+                                    <select class="custom-select form-control" name="payment_particular_type" required autocomplete="off">
+                                        <option value="" disabled selected>Choose here</option>
+                                        <option value="Downpayment">Downpayment</option>
+                                        <option value="Period/Block 1 (For College)">Period/Block 1 (For College)
+                                        </option>
+                                        <option value="Period/Block 2 (For College)">Period/Block 2 (For College)
+                                        </option>
+                                        <option value="Period/Block 3 (For College)">Period/Block 3 (For College)
+                                        </option>
+                                        <option value="Period/Block 3 (For College)">Period/Block 4 (For College)
+                                        </option>
+                                        <option value="1st Quarterly Exam (For SHS)">1st Quarterly Exam (For SHS)
+                                        </option>
+                                        <option value="2nd Quarterly Exam (For SHS)">2nd Quarterly Exam (For SHS)
+                                        </option>
+                                        <option value="3rd Quarterly Exam (For SHS)">3rd Quarterly Exam (For SHS)
+                                        </option>
+                                        <option value="4th Quarterly Exam (For SHS)">4th Quarterly Exam (For SHS)
+                                        </option>
+                                        <option value="1st Long Test (For BED)">1st Long Test (For BED)</option>
+                                        <option value="1st Quarterly Exam (For BED)">1st Quarterly Exam (For BED)
+                                        </option>
+                                        <option value="2nd Long Test (For BED)">2nd Long Test (For BED)</option>
+                                        <option value="2nd Quarterly Exam (For BED)">2nd Quarterly Exam (For BED)
+                                        </option>
+                                        <option value="3rd Long Test (For BED)">3rd Long Test (For BED)</option>
+                                        <option value="3rd Quarterly Exam (For BED)">3rd Quarterly Exam (For BED)
+                                        </option>
+                                        <option value="4th Long Test (For BED)">4th Long Test (For BED)</option>
+                                        <option value="4th Quarterly Exam (For BED)">4th Quarterly Exam (For BED)
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticular !== 'Rental'">
+                        <div class="field">
+                            <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.payment_amount.value|default_if_none:'' }}" v-model="paymentAmount" name="payment_amount"
+                                       class="input form-control" :class="has_error ? 'is-invalid': ''" type="number" min="100" placeholder="" @change="computeTotal" required>
+                                <div v-if="has_error" class="invalid-feedback">Minimum amount should not be less than 100.</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="column" v-if="paymentParticular === 'Rental'">
+                        <div class="field">
+                            <label class="mb-2">Month <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.rental_month.value|default_if_none:'' }}" name="rental_month"
+                                       class="input" type="text" placeholder="" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticular === 'Rental'">
+                        <div class="field">
+                            <label class="mb-2">Year <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.rental_year.value|default_if_none:'' }}" name="rental_year"
+                                       class="input" type="text" placeholder="" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column" v-if="paymentParticular === 'Rental'">
+                        <div class="field">
+                            <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                            <div class="control">
+                                <input value="{{ form.rental_amount.value|default_if_none:'' }}" v-model="rentalAmount1" name="rental_amount"
+                                       class="input" type="number" min="100" placeholder="" @change="computeRentalTotal" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="content" v-if="paymentParticular === 'Rental'">
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <a class="button mt-3" v-if="rentalCount < 4" style="width: 100px;" href="#!" @click="addRental" value="Rental">
+                                Add Rental
+                            </a>
+                            <a class="button mt-3" v-if="rentalCount > 0" style="width: 120px;"  href="#!"  @click="removeRental" value="removeRental">
+                                Remove Rental
+                            </a>
+                        </div>
+                    </div>
+
+                        <div class="column" v-if="rentalCount >= 1">
+                            <input v-model="rentalCount" type="hidden" name="rental_count" value="rentalCount">
+                            <div class="field">
+                                <label class="mb-2">Month <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental2_month.value|default_if_none:'' }}" name="rental2_month"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column" v-if="rentalCount >= 1">
+                            <div class="field">
+                                <label class="mb-2">Year <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental2_year.value|default_if_none:'' }}" name="rental2_year"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column" v-if="rentalCount >= 1">
+                            <div class="field">
+                                <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental2_amount.value|default_if_none:'' }}" v-model="rentalAmount2" name="rental2_amount"
+                                           class="input" type="text" placeholder="" @change="computeRentalTotal" required>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <div class="columns" v-if="rentalCount >= 2">
+                        <div class="column">
+                        </div>
+                        <div class="column">
+                            <input v-model="rentalCount" type="hidden" name="rental3"
+                                   value="1">
+                            <div class="field">
+                                <label class="mb-2">Month <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental3_month.value|default_if_none:'' }}" name="rental3_month"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Year <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental3_year.value|default_if_none:'' }}" name="rental3_year"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental3_amount.value|default_if_none:'' }}" v-model="rentalAmount3" name="rental3_amount"
+                                           class="input" type="text" placeholder="" @change="computeRentalTotal" required>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <div class="columns" v-if="rentalCount >= 3">
+                        <div class="column">
+                        </div>
+                        <div class="column">
+                            <input v-model="rentalCount" type="hidden" name="rental4"
+                                   value="1">
+                            <div class="field">
+                                <label class="mb-2">Month <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental4_month.value|default_if_none:'' }}" name="rental4_month"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Year <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental4_year.value|default_if_none:'' }}"  name="rental4_year"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental4_amount.value|default_if_none:'' }}" v-model="rentalAmount4" name="rental4_amount"
+                                           class="input" type="text" placeholder="" @change="computeRentalTotal" required>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <div class="columns" v-if="rentalCount >= 4">
+                        <div class="column">
+                        </div>
+                        <div class="column">
+                            <input v-model="rentalCount" type="hidden" name="rental_count" value="{{ form.rental_count.value|default_if_none:'' }}">
+                            <div class="field">
+                                <label class="mb-2">Month <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental5_month.value|default_if_none:'' }}" name="rental5_month"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Year <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental5_year.value|default_if_none:'' }}" name="rental5_year"
+                                           class="input" type="text" placeholder="" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="mb-2">Amount <span class="text-danger">*</span></label>
+                                <div class="control">
+                                    <input value="{{ form.rental5_amount.value|default_if_none:'' }}" v-model="rentalAmount5" name="rental5_amount"
+                                           class="input" type="text" placeholder="" @change="computeRentalTotal" required>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+
+            <br>
+            <hr>
+            <br>
+            <h1 class="h3 fw-light mb-5">Payment Options</h1>
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <label class="mb-2">Payment Method <span class="text-danger">*</span></label>
+                            <div class="select is-fullwidth">
+                                <select class="custom-select form-control" v-model="paymentMethod" id="payment_method"
+                                        @change="getPaymentChannels()" name="pmethod" required>
+                                    <option value="" disabled selected>Select Payment Method</option>
+                                    <option v-for="(paymethod, index) in paymentMethods" :value="paymethod.code">
+                                        $[[paymethod.label]]
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <label class="mb-2">Payment Channel <span class="text-danger">*</span></label>
+                            <div class="select is-fullwidth">
+                                <select class="custom-select form-control" name="pchannel" required
+                                        :disabled="!paymentChannels" v-model="paymentChannel" @change="computeTotal">
+                                    <option value="" disabled selected>Select Payment Channel</option>
+                                    <option v-for="(channel, index) in paymentChannels" :value="channel.code">
+                                        $[[channel.label]]
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column" v-if="total !== null && paymentMethod !== null">
+                    <div class="field">
+                                <label class="mb-2">Total Payment <span class="text-primary small">(Fee inclusive of Vat)</span></label>
+                                <div class="control">
+                                    <h4 class="mt-2 h4">
+                                        $[[  total.toLocaleString('en', {
+                                          style: 'currency',
+                                          currency: 'PHP'
+                                        }) ]]
+                                    </h4>
+                                    <input v-model="total" name="total_payment"
+                                           class="input" type="hidden" placeholder="" readonly>
+                                </div>
+                            </div>
+                </div>
+            </div>
+
+
+            <div class="columns">
+                <div class="column">
+
+                </div>
+                <div class="column">
+                    <div class="control">
+                        <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
+                        <button type="submit" class="button mt-3" style="width: 300px;">Proceed to payment</button>
+                    </div>
+                </div>
+                <div class="column">
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row mt-5 mb-5">
+
+        </div>
+        <br><br>
+    </form>
+{% endblock %}
+
+
+{% block tailscripts %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="{% static 'web/js/scripts.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                const $notification = $delete.parentNode
+
+                $delete.addEventListener('click', () => {
+                    $notification.parentNode.removeChild($notification)
+                })
+            })
+        })
+    </script>
+{% endblock %}
+
